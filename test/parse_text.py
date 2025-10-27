@@ -1,9 +1,19 @@
 import html
 import re
+import sys
+import os
 
+# 添加 parse_xml.py 所在目录到 Python 路径
+pro_dir = r"H:\web\lab1\project"  # 根据实际情况修改路径
+sys.path.append(pro_dir)
+
+from parse_xml import*
+from config import *
+from gen_inverted_index import *
 from nltk import word_tokenize
 
-from parse_xml import normalize_text, stemmer, stop_words
+
+# from parse_xml import normalize_text, stemmer, stop_words
 #来自PastEvent 10389592.xml的description
 text ="This is a 100% hands-on workshop that will focus on glamour, implied nude, and provocative posing. It is open to photographers at all levels.  You will be working in a commercial studio, using a full range of high-end studio gear and experienced professional models.  Individual training and assistance will be available throughout the event.  Due to the nature of this shoot, seating is very limited.  Here are some highlights:&lt;br /&gt;&lt;br /&gt;•  high contrast lighting&lt;br /&gt;•  prone and proactive posing&lt;br /&gt;•  implied nude posing&lt;br /&gt;•  very special (1 time only) glamour ballerina using point shoes&lt;br /&gt;•   (see samples the models and sets)    &lt;a href=&quot;http://www.pbase.com/beauarts/june07&quot; target=&quot;_blank&quot;&gt;(click here)&lt;/a&gt;&lt;br /&gt;&lt;br /&gt;Time:  Sunday, June 7th 10AM – 2PM (#)&lt;br /&gt;Place: Jerry Bedrick Studios, 122 Western Avenue, Suite A311-A312, Lowell, MA 01850&lt;br /&gt;Contact:  Jerry Bedrick   -    jerry@jerrybedrick.com     -    781.771.3101&lt;br /&gt;Cost:   $55 (##) &lt;br /&gt;&lt;br /&gt;(#)    There will be a free pre-shoot workshop on studio basics from 9AM-10AM&lt;br /&gt;(##) $55 prepaid, $65 at the door.&lt;br /&gt;"
 
@@ -26,3 +36,4 @@ clean_tokens = [
     if word not in stop_words
 ]
 print(clean_tokens)
+

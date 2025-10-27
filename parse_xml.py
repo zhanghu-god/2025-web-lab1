@@ -11,6 +11,9 @@ from nltk.tokenize import word_tokenize
 stop_words = set(stopwords.words('english'))
 stemmer = PorterStemmer()
 
+##整个文件规范化了文件夹当中所有文件的description.text文本
+
+
 def parse_group_file(filepath):
     tree = ET.parse(filepath)
     root = tree.getroot()
@@ -30,6 +33,7 @@ def normalize_text(text):
     tokens = word_tokenize(text)
     # 去停用词 & 词干化
     clean_tokens = [
+        #遍历tokens，先判断是否是停用词，不是则词干化，同时存入clean_tokens中，否则不存
         stemmer.stem(word) for word in tokens
         if word not in stop_words
     ]
@@ -41,10 +45,10 @@ def parse_all(folder):
         filepath = os.path.join(folder, filename)
         try:
             text = parse_group_file(filepath)
-            tokens = normalize_text(text)
+            tokens = normalize_text(text)#处理好的词
             if not tokens:
                 continue
-            docs[filename] = tokens
+            docs[filename] = tokens#正排表
         except Exception as e:
             print(f"解析 {filename} 出错: {e}")
     return docs

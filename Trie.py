@@ -9,6 +9,7 @@ class Trie:
         self.root = TrieNode() #初始化根节点，没有对应的字符
         self.count = 0 #记录插入的单词数量
 
+    #插入一个单词
     def insert(self, word, posting_index):
         node = self.root
         for char in word:
@@ -22,17 +23,21 @@ class Trie:
     def search(self, word):
         node = self.root
         for char in word:
-            if char not in node.children:
+            if char not in node.children :
                 return -1
             node = node.children[char]
         return node.posting_index if node.is_end_of_word else -1  # 返回倒排表的索引位置
 
     #递归遍历Trie树，提取字符以及倒排表索引
+    # node：当前遍历的Trie节点（初始调用时通常传入根节点 self.root）。
+    # prefix：从根节点到当前节点的路径构成的字符串（初始为空字符串 ""）。
+    # words：用于保存所有完整单词的列表（​​按引用传递​​，递归过程中填充结果）。
+    # posting_indexes：用于保存所有单词对应的倒排表索引的列表（与words一一对应）。
     def extract_words(self, node, prefix, words, posting_indexes):
         if node.is_end_of_word:
             words.append(prefix)
             posting_indexes.append(node.posting_index)  # 记录倒排表索引
-        for char, child in node.children.items():
+        for char, child in node.children.items():#char是当前节点的键，child是当前节点的值，字典键值对
             self.extract_words(child, prefix + char, words, posting_indexes)
 
     '''以下是几种将字典压缩和解压的方式'''
@@ -84,7 +89,14 @@ class Trie:
             posting_ptr, start_index = block
             for i, posting_index in enumerate(posting_ptr):
                 #获取词项在long_string中的起始位置和长度
-                word_start = start_index + sum([ord(long_string[j]) + 1 for j in range(i)])  # 通过长度获取每个词项
+                # word_start = start_index + sum([ord(long_string[j]) + 1 for j in range(i)])
+                j = 0  
+                for k in range(i):  # 获取词项在long_string中的起始位置
+                    word_start = start_index + ord(long_string[j]) + 1
+                    j += ord(long_string[j]) + 1
+
+                # 通过长度获取每个词项
+                # 这里的for是递归这算的应该，j=i代表之前i-1个计算结果的和
                 word_length = ord(long_string[word_start])  # 获取词项的长度
                 word = long_string[word_start + 1: word_start + word_length + 1]  # 提取词项
                 #在Trie树中插入词项，并将倒排表索引赋值给对应的节点
