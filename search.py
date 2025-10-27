@@ -98,17 +98,20 @@ def search_words(words,dictionary, inverted_index):#word是输入的单个查询
     for word in words:
         temp = search_word(word,dictionary, inverted_index)
         if(word==words[0]):
-            file_ids = temp
+            files_ids = temp
         else:
-            file_ids = AND(file_ids,temp)
+            files_ids = AND(files_ids,temp)
         count += 1
     #汇总了同时含有短语所有单词的文档
     results_ids = []
-    for id in file_ids:
-        for position in words[0][id]:
+    position_index = []
+    for word in words:
+        position_index.append(dictionary.search(word))
+    for id in files_ids:
+        for position in inverted_index[position_index[0]][0][id]:
             flag = 0
             for i in range(1,count-1,1):
-                if(position+i not in words[i][id]):
+                if(position+i not in inverted_index[position_index[i]][0][id]):
                     break
                 else:
                     flag += 1

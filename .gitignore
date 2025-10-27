@@ -152,3 +152,4 @@ env/
 *.bak
 
 config.py
+test/
