@@ -102,33 +102,7 @@ def search_word_skip(word,dictionary, inverted_index):
 
 
 
-#####################改动3
-def search_words(words,dictionary, inverted_index):#word是输入的单个查询单词
-    count = 0
-    for word in words:
-        temp = search_word(word,dictionary, inverted_index)
-        if(word==words[0]):
-            files_ids = temp
-        else:
-            files_ids = AND(files_ids,temp)
-        count += 1
-    #汇总了同时含有短语所有单词的文档
-    results_ids = []
-    position_index = []
-    for word in words:
-        position_index.append(dictionary.search(word))
-    for id in files_ids:
-        for position in inverted_index[position_index[0]][0][id]:
-            flag = 0
-            for i in range(1,count-1,1):
-                if(position+i not in inverted_index[position_index[i]][0][id]):
-                    break
-                else:
-                    flag += 1
-            if flag == count-1:
-                results_ids.append(id)
-                break
-    return  results_ids
+
         
 
 
@@ -183,8 +157,6 @@ def AND_SKIP(inverted_index_1,inverted_index_2):#使用跳表指针的优化合�
 
 
 
-
-
 def OR(arr1, arr2):
     return list(set(arr1) | set(arr2))
 
@@ -194,15 +166,11 @@ def NOT(arr1, arr2):#返回arr1中有arr2中没有的元素
 def recursive_search(tree, dictionary, inverted_index, id_name_list):
     # """递归计算布尔表达式语法树"""
     if tree['type'] == 'term':
-        # if tree['value'][1]!=None:####################改动2
-        #     return search_words(tree['value'], dictionary, inverted_index)
         return search_word(tree['value'][0], dictionary, inverted_index)
     elif tree['type'] == 'operator':
         if tree['operator'] == 'and':
             left_result = recursive_search(tree['left'], dictionary, inverted_index, id_name_list)
             right_result = recursive_search(tree['right'], dictionary, inverted_index, id_name_list)
-            # if tree['left']['type'] == 'term' or tree['right']['type'] == 'term':     #改动4
-            #     return AND_SKIP(left_result, right_result)
             return AND(left_result, right_result)
         elif tree['operator'] == 'or':
             left_result = recursive_search(tree['left'], dictionary, inverted_index, id_name_list)
@@ -215,28 +183,23 @@ def recursive_search(tree, dictionary, inverted_index, id_name_list):
 def recursive_search_skip(tree, dictionary, inverted_index, id_name_list):
     # """递归计算布尔表达式语法树"""
     if tree['type'] == 'term':
-        # if tree['value'][1]!=None:####################改动2
-        #     return search_words(tree['value'], dictionary, inverted_index)
         return search_word_skip(tree['value'][0], dictionary, inverted_index)
     elif tree['type'] == 'operator':
         if tree['operator'] == 'and':
-            # if tree['left']['type'] == 'term' or tree['right']['type'] == 'term':     #改动4
-            #     return AND_SKIP(left_result, right_result)
-            # return AND(left_result, right_result)
             if tree['left']['type'] == 'term' and tree['right']['type'] == 'term':
                 left_result = recursive_search_skip(tree['left'], dictionary, inverted_index, id_name_list)
                 right_result = recursive_search_skip(tree['right'], dictionary, inverted_index, id_name_list)     
                 return AND_SKIP(left_result, right_result)
             else:     
-                left_result = recursive_search(tree['left'], dictionary, inverted_index, id_name_list)
-                right_result = recursive_search(tree['right'], dictionary, inverted_index, id_name_list)
+                left_result = recursive_search_skip(tree['left'], dictionary, inverted_index, id_name_list)
+                right_result = recursive_search_skip(tree['right'], dictionary, inverted_index, id_name_list)
                 return AND(left_result, right_result)
         elif tree['operator'] == 'or':
-            left_result = recursive_search(tree['left'], dictionary, inverted_index, id_name_list)
-            right_result = recursive_search(tree['right'], dictionary, inverted_index, id_name_list)
+            left_result = recursive_search_skip(tree['left'], dictionary, inverted_index, id_name_list)
+            right_result = recursive_search_skip(tree['right'], dictionary, inverted_index, id_name_list)
             return OR(left_result, right_result)
         elif tree['operator'] == 'not':
-            operand_result = recursive_search(tree['operand'], dictionary, inverted_index, id_name_list)
+            operand_result = recursive_search_skip(tree['operand'], dictionary, inverted_index, id_name_list)
             return NOT(id_name_list, operand_result)
 
 
@@ -256,7 +219,9 @@ def bool_search_skip(text, dictionary, inverted_index, id_name):#text是输入�
     return recursive_search_skip(tree, dictionary, inverted_index, id_name_list)
 
 
-def count_words(doc,id,id_name):
+
+####TF-IDF
+def count_words(doc,id,id_name):#计算文档总的含词数
     count = 0
     for word in doc[id_name[id]]:
         count += 1
@@ -423,6 +388,77 @@ def TF_IDF_search_not_bool(texts_original,dictionary, inverted_index,id_name,doc
     TF_IDF_search(texts_original,ids,dictionary, inverted_index,id_name,doc)
 
 
+
+
+
+
+
+
+
+
+
+#####################下面是可以处理短语的部分############
+def evaluator(text):
+    #小写
+    text=text.lower()
+    # 去掉特殊符号（保留单词和空格,和括号）
+    text = html.unescape(text)  # 转回 <p>Our purpose:</p>
+    text = re.sub(r"<.*?>", "", text)  # 去掉 <p> 和 </p>
+    text = re.sub(r"[^a-z\s()]", " ",  text) #把除了字母和空白符号的其他符号换成空格
+    # 分词
+    tokens = word_tokenize(text)#分词
+    clean_tokens = []
+    for word in tokens:
+        clean_tokens.append(stemmer.stem(word))#词干化
+    return clean_tokens
+
+def search_phrase(text,dictionary, inverted_index):
+    tokens = evaluator(text)
+    ids = []
+    count = 0 #计数，计算短语中单词的个数
+    for word in tokens:
+        ids_text = search_word(word,dictionary, inverted_index) #问题1：无法使用跳表指针，只有都是倒排表才能用
+        if ids_text == []:
+            print("没有找到该短语")
+            return []
+        elif count == 0:
+            ids = ids_text
+            count += 1
+        else:
+            count += 1
+            ids = AND(ids,ids_text)
+    #汇总了同时含有短语所有单词的文档
+    result_ids = []
+    position_index = []
+    for word in tokens:
+        position_index.append(dictionary.search(word))
+    for id in ids:
+        print("id:",id,"\n")
+        for position in inverted_index[position_index[0]][0][id]:
+            print("position:",position,"\n")
+            flag = 0
+            for i in range(1,count,1):#注意这里不包含右边界
+                if(position+i not in inverted_index[position_index[i]][0][id]):
+                    # print("closer对应的文档位置",inverted_index[position_index[i-1]][0][id],"\n")
+                    # print("to对应的文档位置",inverted_index[position_index[i]][0][id],"\n")
+                    break
+                else:
+                    flag += 1
+            # print("flag：",flag,"\n")
+            if flag == count-1:
+                # print("flag：",flag,"\n")
+                # print("id:",id,"\n")
+                result_ids.append(id)
+                break
+    # print("text:",text,"\n")
+    # print("tokens:",tokens,"\n")
+    # print("position_index:",position_index,"\n")
+    # print("ids:",ids,"\n")
+    # print("position:",position,"\n")
+    # print("flag:",flag,"\n")
+    # print("count:",count,"\n")
+    # print("短语搜索结果：",result_ids)
+    return  result_ids
 
 
 

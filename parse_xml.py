@@ -67,3 +67,17 @@ def parse_all(folder):
         except Exception as e:
             print(f"解析 {filename} 出错: {e}")
     return docs
+
+def parse_all_full(folder):
+    docs = {}
+    for filename in os.listdir(folder):
+        filepath = os.path.join(folder, filename)
+        try:
+            text = parse_group_file(filepath)
+            tokens = normalize_text_full(text)#处理好的词
+            if not tokens:
+                continue
+            docs[filename] = tokens#正排表
+        except Exception as e:
+            print(f"解析 {filename} 出错: {e}")
+    return docs
