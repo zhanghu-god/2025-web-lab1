@@ -57,48 +57,117 @@ class Trie:
     #将Trie树转化成按块存储的形式
     def convert_to_blocking(self, block_size):
         # 提取所有词项及其倒排表位置索引
-        words = []
-        posting_indexes = []
+        words, posting_indexes = [], []
         self.extract_words(self.root, "", words, posting_indexes)
         # 拼接所有词项成一个长字符串
         long_string = ""
         blocks = []  #最终返回的blocking结构
-        index = 0   #long_string里的索引,从0开始
-        posting_ptr = [] #块内倒排表索引的列表
-        cnt = 0
-        for i, word in enumerate(words):
-            posting_ptr.append(posting_indexes[i])
-            long_string += chr(len(word)) + word  # 词项的长度+词项本身（用一个字节表示长度）
-            #每满一个块，保存该块的内容
-            if cnt == block_size - 1:
-                blocks.append((posting_ptr, index))
-                posting_ptr = [] #重新初始化倒排表指针列表
-                index = len(long_string) #更新当前词项在long_string中的起始位置
-                cnt = 0
-            else:
-                cnt += 1
-        # 最后将剩余的posting_ptr添加到block中
-        if posting_ptr:
-            blocks.append((posting_ptr, index))
+        offset = 0  # 当前块在 long_string 中的起始位置
+        # 按 block_size 分块
+        for start in range(0, len(words), block_size):
+            # 当前块内的词项和对应 posting index
+            block_words = words[start:start + block_size]
+            block_postings = posting_indexes[start:start + block_size]
+            # 将块内所有词项拼接成：长度(1B)+词项
+            encoded_block = ""
+            for w in block_words:
+                encoded_block += chr(len(w)) + w
+
+            # 记录块信息（倒排表指针列表 + 当前块在字符串中的起始偏移）
+            blocks.append((block_postings, offset))
+
+            # 更新整体字符串与偏移
+            long_string += encoded_block
+            offset += len(encoded_block)
+
         return blocks, long_string
     #从blocking结构中解压出Trie树
     @staticmethod
     def decompress_from_blocking(blocks, long_string):
         trie = Trie()
-        for block in blocks:
-            posting_ptr, start_index = block
-            for i, posting_index in enumerate(posting_ptr):
-                #获取词项在long_string中的起始位置和长度
-                # word_start = start_index + sum([ord(long_string[j]) + 1 for j in range(i)])
-                j = 0  
-                for k in range(i):  # 获取词项在long_string中的起始位置
-                    word_start = start_index + ord(long_string[j]) + 1
-                    j += ord(long_string[j]) + 1
-
-                # 通过长度获取每个词项
-                # 这里的for是递归这算的应该，j=i代表之前i-1个计算结果的和
-                word_length = ord(long_string[word_start])  # 获取词项的长度
-                word = long_string[word_start + 1: word_start + word_length + 1]  # 提取词项
-                #在Trie树中插入词项，并将倒排表索引赋值给对应的节点
+        for posting_ptr, start_index in blocks:
+            pos = start_index  # 当前块内的读取位置
+            for posting_index in posting_ptr:
+                # 读取长度字节
+                word_len = ord(long_string[pos])
+                pos += 1
+                # 读取实际词项
+                word = long_string[pos:pos + word_len]
+                pos += word_len
+                # 插入到 Trie
                 trie.insert(word, posting_index)
         return trie
+    #获取两个字符串的公共前缀
+    @staticmethod
+    def get_lcp(a: str, b: str) -> str:
+        i = 0
+        m = min(len(a), len(b))
+        while i < m and a[i] == b[i]:
+            i += 1
+        return a[:i]
+    #将Trie树转化为前段编码存储
+    def convert_to_front_coding(self, block_size: int):
+        words, posting_indexes = [], []
+        self.extract_words(self.root, "", words, posting_indexes)
+
+        blocks, long_string = [], ""
+        offset = 0
+
+        for start in range(0, len(words), block_size):
+            block_words = list(words[start:start+block_size])
+            block_postings = list(posting_indexes[start:start+block_size])
+
+            # 计算块内 LCP
+            lcp = block_words[0]
+            for word in block_words[1:]:
+                lcp = self.get_lcp(lcp, word)
+                if not lcp:
+                    break
+
+            # 写入：lcp长度 + 第一个单词
+            encoded = chr(len(lcp)) + block_words[0]
+
+            # 写入剩下单词每个后缀
+            for word in block_words[1:]:
+                suffix = word[len(lcp):]
+                encoded += chr(len(suffix)) + suffix
+
+            blocks.append((block_postings, offset))
+            offset += len(encoded)
+            long_string += encoded
+
+        return blocks, long_string
+
+    @staticmethod
+    def decompress_from_front_coding(blocks, long_string):
+        trie = Trie()
+        for posting_ptr, start_index in blocks:
+            pos = start_index
+
+            # 读取 LCP 长度
+            lcp_len = ord(long_string[pos])
+            pos += 1
+
+            # 读取第一个完整单词
+            first_word = ""
+            # 一直读取，直到后续遇到“长度字节”（ASCII < 65 ）
+            while pos < len(long_string) and ord(long_string[pos]) >= 65:
+                first_word += long_string[pos]
+                pos += 1
+
+            trie.insert(first_word, posting_ptr[0])
+            lcp = first_word[:lcp_len]
+
+            # 读取剩余单词
+            for posting_index in posting_ptr[1:]:
+                if pos >= len(long_string):
+                    break
+                suffix_len = ord(long_string[pos])
+                pos += 1
+                suffix = long_string[pos:pos + suffix_len]
+                pos += suffix_len
+                word = lcp + suffix
+                trie.insert(word, posting_index)
+
+        return trie
+
