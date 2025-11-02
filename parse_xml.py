@@ -38,6 +38,21 @@ def normalize_text(text):
         if word not in stop_words
     ]
     return clean_tokens
+def normalize_text_full(text):
+    #小写
+    text=text.lower()
+    # 去掉特殊符号（保留单词和空格）
+    text = html.unescape(text)  # 转回 <p>Our purpose:</p>
+    text = re.sub(r"<.*?>", "", text)  # 去掉 <p> 和 </p>
+    text = re.sub(r"[^a-z\s]", " ", text) #把除了字母和空白符号的其他符号换成空格
+    # 分词
+    tokens = word_tokenize(text)
+    # 去停用词 & 词干化
+    clean_tokens = [
+        #遍历tokens，先判断是否是停用词，不是则词干化，同时存入clean_tokens中，否则不存
+        stemmer.stem(word) for word in tokens
+    ]
+    return clean_tokens
 
 def parse_all(folder):
     docs = {}

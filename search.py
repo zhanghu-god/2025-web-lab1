@@ -84,14 +84,23 @@ def _build_syntax_tree(tokens):
         return tree_stack[0] if tree_stack else None
     
 
-def search_word(word,dictionary, inverted_index):#word是输入的单个查询单词
+def search_word(word,dictionary, inverted_index):#word是输入的单个查询单词，这里只返回了倒排表内的id
     posting_index = dictionary.search(word)
     if posting_index != -1:
         file_ids = list(inverted_index[posting_index][0].keys())
     else:
         file_ids = []
-    # print(word,":",file_ids,"\n")
+    print(word,":",file_ids,"\n")
     return file_ids
+
+# 跳表指针对应的search_word函数，直接返回一个倒排表字典
+def search_word_skip(word,dictionary, inverted_index):
+    posting_index = dictionary.search(word)
+    return inverted_index[posting_index]
+
+# 倒排表：1.id[位置]，2.跳表指针
+
+
 
 #####################改动3
 def search_words(words,dictionary, inverted_index):#word是输入的单个查询单词
@@ -126,9 +135,55 @@ def search_words(words,dictionary, inverted_index):#word是输入的单个查询
 def AND(arr1, arr2):
     return list(set(arr1) & set(arr2))
 
-def AND_SKIP(arr1, arr2):#使用跳表指针的优化合并，估计得加参数。
+def AND_SKIP(inverted_index_1,inverted_index_2):#使用跳表指针的优化合并，参数改为两个倒排表。
+    temp_1 = list(inverted_index_1[0].keys())
+    temp_2 = list(inverted_index_2[0].keys())
+    temp_skip_1 = list(inverted_index_1[1].values())
+    temp_skip_2 = list(inverted_index_2[1].values())
+    length_1 = len(temp_1)
+    length_2 = len(temp_2)
+    results_ids = []
 
-    return list(set(arr1) - set(arr2))
+    i = 0
+    j = 0
+    while 1:
+        if temp_1[i] < temp_2[j]:
+            if temp_1[i] in temp_skip_1:
+                for temp_id in temp_skip_1:
+                    if temp_id < temp_2[j]:
+                        i = temp_1.index(temp_id)+1
+                    elif temp_id == temp_2[j]:
+                        results_ids.append(temp_id)
+                        i = temp_1.index(temp_id)+1
+                        j += 1
+                    else:
+                        break
+            else:
+                i += 1 
+        elif temp_2[j] < temp_1[i]:
+            if temp_2[j] in temp_skip_2:
+                for temp_id in temp_skip_2:
+                    if temp_id < temp_1[i]:
+                        j = temp_2.index(temp_id)+1
+                    elif temp_id == temp_1[i]:
+                        results_ids.append(temp_id)
+                        j = temp_2.index(temp_id)+1
+                        i += 1
+                    else:
+                        break
+            else:
+                j += 1
+        elif temp_1[i] == temp_2[j]:
+            results_ids.append(temp_1[i])
+            i += 1
+            j += 1
+        if i >= length_1-1 or j >= length_2-1:
+            break
+    return results_ids
+
+
+
+
 
 def OR(arr1, arr2):
     return list(set(arr1) | set(arr2))
@@ -157,6 +212,34 @@ def recursive_search(tree, dictionary, inverted_index, id_name_list):
             operand_result = recursive_search(tree['operand'], dictionary, inverted_index, id_name_list)
             return NOT(id_name_list, operand_result)
 
+def recursive_search_skip(tree, dictionary, inverted_index, id_name_list):
+    # """递归计算布尔表达式语法树"""
+    if tree['type'] == 'term':
+        # if tree['value'][1]!=None:####################改动2
+        #     return search_words(tree['value'], dictionary, inverted_index)
+        return search_word_skip(tree['value'][0], dictionary, inverted_index)
+    elif tree['type'] == 'operator':
+        if tree['operator'] == 'and':
+            # if tree['left']['type'] == 'term' or tree['right']['type'] == 'term':     #改动4
+            #     return AND_SKIP(left_result, right_result)
+            # return AND(left_result, right_result)
+            if tree['left']['type'] == 'term' and tree['right']['type'] == 'term':
+                left_result = recursive_search_skip(tree['left'], dictionary, inverted_index, id_name_list)
+                right_result = recursive_search_skip(tree['right'], dictionary, inverted_index, id_name_list)     
+                return AND_SKIP(left_result, right_result)
+            else:     
+                left_result = recursive_search(tree['left'], dictionary, inverted_index, id_name_list)
+                right_result = recursive_search(tree['right'], dictionary, inverted_index, id_name_list)
+                return AND(left_result, right_result)
+        elif tree['operator'] == 'or':
+            left_result = recursive_search(tree['left'], dictionary, inverted_index, id_name_list)
+            right_result = recursive_search(tree['right'], dictionary, inverted_index, id_name_list)
+            return OR(left_result, right_result)
+        elif tree['operator'] == 'not':
+            operand_result = recursive_search(tree['operand'], dictionary, inverted_index, id_name_list)
+            return NOT(id_name_list, operand_result)
+
+
 
 
 def bool_search(text, dictionary, inverted_index, id_name):#text是输入的查询文本
@@ -165,6 +248,12 @@ def bool_search(text, dictionary, inverted_index, id_name):#text是输入的查�
     id_name_list = list(id_name.keys())
     return recursive_search(tree, dictionary, inverted_index, id_name_list)
 
+
+def bool_search_skip(text, dictionary, inverted_index, id_name):#text是输入的查询文本
+    tokens = bool_evaluator(text)
+    tree = _build_syntax_tree(tokens)
+    id_name_list = list(id_name.keys())
+    return recursive_search_skip(tree, dictionary, inverted_index, id_name_list)
 
 
 def count_words(doc,id,id_name):
