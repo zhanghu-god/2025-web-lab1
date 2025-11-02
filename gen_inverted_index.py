@@ -3,7 +3,7 @@ import math
 from Trie import Trie
 from config import DATA_DIR
 from parse_xml import *
-from store import store_list, store_blocking
+from store import store_list, store_blocking, store_front_coding
 
 
 def split_index(inverted_index_pre):
@@ -132,6 +132,7 @@ if __name__ == "__main__":
     #未压缩直接存储
     store_list(dictionary, inverted_index, id_name)
     store_blocking(dictionary)
+    store_front_coding(dictionary)
     # # 打印文档数量
     # print(f"共处理 {len(documents)} 篇文档")
     # # 看看第一个文档的 tokens

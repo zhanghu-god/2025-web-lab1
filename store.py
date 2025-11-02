@@ -35,3 +35,10 @@ def store_blocking(dictionary):
     blocks, long_string = dictionary.convert_to_blocking(BLOCK_SIZE)
     store_pickle((blocks, long_string), DICTIONARY_BLOCKING)
     store_json((blocks, long_string), DICTIONARY_BLOCKING_JSON)
+#前端编码存储
+def store_front_coding(dictionary):
+    # store_inverted_index(inverted_index)
+    # store_id_name(id_name)
+    blocks, long_string = dictionary.convert_to_front_coding(BLOCK_SIZE)
+    store_pickle((blocks, long_string), DICTIONARY_FrontCoding)
+    store_json((blocks, long_string), DICTIONARY_FrontCoding_JSON)
