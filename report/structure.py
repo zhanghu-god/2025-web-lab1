@@ -15,6 +15,37 @@ RSVPs:
     共计：65128
 总计：242193
 
+短语搜索用例：text = "closer to"
+测试代码：
+# text = "closer to"
+# search_result = search_phrase(text, dictionary, inverted_index)
+# print("短语搜索：",search_result,"\n")
+
+
+布尔搜索用例：text = "ap and pa"    text = "go and back"
+测试代码：
+# text = "back and go"
+# search_result = bool_search(text, dictionary, inverted_index, id_name)
+# print("search",search_result,"\n")
+# search_result_sorted = sorted(search_result)
+# search_result_skip = bool_search_skip(text, dictionary, inverted_index, id_name) #跳表指针搜索
+# print("search_skip",search_result_skip,"\n")
+# if search_result_sorted == search_result_skip:
+#     print("skip_search_success")
+# else:
+#     print("skip_search_fail")
+
+
+TF-IDF 测试代码
+# while True:
+#     text = input("请输入查询：")
+#     if text == "###":
+#         break
+#     search_result = bool_search(text, dictionary, inverted_index, id_name)
+#     print(search_result,"\n")
+#     TF_IDF_search_not_bool(text, dictionary, inverted_index, id_name, docs)
+
+
 
 """#倒排表的结构示例
 inverted_index_pre = {
