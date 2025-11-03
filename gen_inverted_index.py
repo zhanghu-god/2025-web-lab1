@@ -1,9 +1,9 @@
 import math
 
 from Trie import Trie
-from config import DATA_DIR
+from config import *
 from parse_xml import *
-from store import store_list, store_blocking, store_front_coding
+from store import store_list, store_blocking, store_front_coding, store_json, store_pickle
 
 
 def split_index(inverted_index_pre):
@@ -64,6 +64,10 @@ def gen_inverted_index(documents):
         data.append(skip_pointers)
     # 按字母排序
     inverted_index_pre = dict(sorted(inverted_index_pre.items()))
+    #存储原始倒排表
+    store_pickle(inverted_index_pre, INVERTED_INDEX_PRE)
+    store_json(inverted_index_pre, INVERTED_INDEX_PRE_JSON)
+    #词典和倒排表分离
     dictionary, inverted_index = split_index(inverted_index_pre)
     return dictionary, inverted_index, id_name
 

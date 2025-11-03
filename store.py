@@ -1,12 +1,17 @@
 import json
+import os
 import pickle
 
 from config import *
 
 def store_pickle(file,path):
+    # 创建目录（如果不存在）
+    os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "wb") as f:
         pickle.dump(file, f)
 def store_json(file,path):
+    # 创建目录（如果不存在）
+    os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w") as f:
         json.dump(file, f, ensure_ascii=False, indent=2)
 
@@ -24,7 +29,6 @@ def store_list(dictionary, inverted_index, id_name):
     store_inverted_index(inverted_index)
     store_id_name(id_name)
     words, posting_indexes = dictionary.convert_to_list()
-    print(len(words))
     store_pickle((words, posting_indexes), DICTIONARY_ORIN)
     store_json((words, posting_indexes), DICTIONARY_ORIN_JSON)
 
@@ -32,13 +36,13 @@ def store_list(dictionary, inverted_index, id_name):
 def store_blocking(dictionary):
     # store_inverted_index(inverted_index)
     # store_id_name(id_name)
-    blocks, long_string = dictionary.convert_to_blocking(BLOCK_SIZE)
-    store_pickle((blocks, long_string), DICTIONARY_BLOCKING)
-    store_json((blocks, long_string), DICTIONARY_BLOCKING_JSON)
+    blocking = dictionary.convert_to_blocking(BLOCK_SIZE)
+    store_pickle(blocking, DICTIONARY_BLOCKING)
+    #store_json(blocking, DICTIONARY_BLOCKING_JSON)
 #前端编码存储
 def store_front_coding(dictionary):
     # store_inverted_index(inverted_index)
     # store_id_name(id_name)
-    blocks, long_string = dictionary.convert_to_front_coding(BLOCK_SIZE)
-    store_pickle((blocks, long_string), DICTIONARY_FrontCoding)
-    store_json((blocks, long_string), DICTIONARY_FrontCoding_JSON)
+    front_coding = dictionary.convert_to_front_coding(BLOCK_SIZE)
+    store_pickle(front_coding, DICTIONARY_FrontCoding)
+    #store_json(front_coding, DICTIONARY_FrontCoding_JSON)

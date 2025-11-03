@@ -56,6 +56,7 @@ class Trie:
 
     #将Trie树转化成按块存储的形式
     def convert_to_blocking(self, block_size):
+        from Blocking import Blocking
         # 提取所有词项及其倒排表位置索引
         words, posting_indexes = [], []
         self.extract_words(self.root, "", words, posting_indexes)
@@ -80,23 +81,23 @@ class Trie:
             long_string += encoded_block
             offset += len(encoded_block)
 
-        return blocks, long_string
-    #从blocking结构中解压出Trie树
+        return Blocking(blocks, long_string)
     @staticmethod
-    def decompress_from_blocking(blocks, long_string):
+    def decompress_from_blocking(blocking):
         trie = Trie()
-        for posting_ptr, start_index in blocks:
+        for posting_ptr, start_index in blocking.blocks:
             pos = start_index  # 当前块内的读取位置
             for posting_index in posting_ptr:
                 # 读取长度字节
-                word_len = ord(long_string[pos])
+                word_len = ord(blocking.long_string[pos])
                 pos += 1
                 # 读取实际词项
-                word = long_string[pos:pos + word_len]
+                word = blocking.long_string[pos:pos + word_len]
                 pos += word_len
                 # 插入到 Trie
                 trie.insert(word, posting_index)
         return trie
+    #blocking
     #获取两个字符串的公共前缀
     @staticmethod
     def get_lcp(a: str, b: str) -> str:
@@ -106,7 +107,8 @@ class Trie:
             i += 1
         return a[:i]
     #将Trie树转化为前段编码存储
-    def convert_to_front_coding(self, block_size: int):
+    def convert_to_front_coding(self, block_size):
+        from Blocking import FrontCoding
         words, posting_indexes = [], []
         self.extract_words(self.root, "", words, posting_indexes)
 
@@ -136,23 +138,23 @@ class Trie:
             offset += len(encoded)
             long_string += encoded
 
-        return blocks, long_string
+        return FrontCoding(blocks, long_string)
 
     @staticmethod
-    def decompress_from_front_coding(blocks, long_string):
+    def decompress_from_front_coding(front_coding):
         trie = Trie()
-        for posting_ptr, start_index in blocks:
+        for posting_ptr, start_index in front_coding.blocks:
             pos = start_index
 
             # 读取 LCP 长度
-            lcp_len = ord(long_string[pos])
+            lcp_len = ord(front_coding.long_string[pos])
             pos += 1
 
             # 读取第一个完整单词
             first_word = ""
             # 一直读取，直到后续遇到“长度字节”（ASCII < 65 ）
-            while pos < len(long_string) and ord(long_string[pos]) >= 65:
-                first_word += long_string[pos]
+            while pos < len(front_coding.long_string) and ord(front_coding.long_string[pos]) >= 65:
+                first_word += front_coding.long_string[pos]
                 pos += 1
 
             trie.insert(first_word, posting_ptr[0])
@@ -160,14 +162,13 @@ class Trie:
 
             # 读取剩余单词
             for posting_index in posting_ptr[1:]:
-                if pos >= len(long_string):
+                if pos >= len(front_coding.long_string):
                     break
-                suffix_len = ord(long_string[pos])
+                suffix_len = ord(front_coding.long_string[pos])
                 pos += 1
-                suffix = long_string[pos:pos + suffix_len]
+                suffix = front_coding.long_string[pos:pos + suffix_len]
                 pos += suffix_len
                 word = lcp + suffix
                 trie.insert(word, posting_index)
-
         return trie
 

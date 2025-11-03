@@ -108,8 +108,8 @@ inverted_index = [
     #...
 ]
 
-"""按块存储的结构"""
-inverted_index_blocking = [
+"""词典按块存储的结构"""
+dictionary_blocking = [
     (
         [3,6,133,269],
         0   #第0个word的索引
