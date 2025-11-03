@@ -440,9 +440,9 @@ def search_phrase(text,dictionary, inverted_index):
     for word in tokens:
         position_index.append(dictionary.search(word))
     for id in ids:
-        print("id:",id,"\n")
+        # print("id:",id,"\n")
         for position in inverted_index[position_index[0]][0][id]:
-            print("position:",position,"\n")
+            # print("position:",position,"\n")
             flag = 0
             for i in range(1,count,1):#注意这里不包含右边界
                 if(position+i not in inverted_index[position_index[i]][0][id]):
