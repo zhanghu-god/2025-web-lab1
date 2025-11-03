@@ -114,7 +114,6 @@ def AND_SKIP(inverted_index_1,inverted_index_2):#使用跳表指针的优化合�
     length_1 = len(temp_1)
     length_2 = len(temp_2)
     results_ids = []
-
     i = 0
     j = 0
     while 1:
@@ -190,13 +189,23 @@ def recursive_search_skip(tree, dictionary, inverted_index, id_name_list):
             else:     
                 left_result = recursive_search_skip(tree['left'], dictionary, inverted_index, id_name_list)
                 right_result = recursive_search_skip(tree['right'], dictionary, inverted_index, id_name_list)
+                if type(left_result[0]) == dict:
+                    left_result = list(left_result[0].keys())
+                if type(right_result[0]) == dict:
+                    right_result = list(right_result[0].keys())
                 return AND(left_result, right_result)
         elif tree['operator'] == 'or':
             left_result = recursive_search_skip(tree['left'], dictionary, inverted_index, id_name_list)
             right_result = recursive_search_skip(tree['right'], dictionary, inverted_index, id_name_list)
+            if type(left_result[0]) ==dict:
+                left_result = list(left_result[0].keys())
+            if type(right_result[0]) == dict:
+                right_result = list(right_result[0].keys())
             return OR(left_result, right_result)
         elif tree['operator'] == 'not':
             operand_result = recursive_search_skip(tree['operand'], dictionary, inverted_index, id_name_list)
+            if type(operand_result[0]) == dict:
+                operand_result = list(operand_result[0].keys())
             return NOT(id_name_list, operand_result)
 
 
