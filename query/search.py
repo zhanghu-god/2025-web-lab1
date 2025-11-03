@@ -87,7 +87,7 @@ def search_word(word,dictionary, inverted_index):#word是输入的单个查询�
         file_ids = list(inverted_index[posting_index][0].keys())
     else:
         file_ids = []
-    print(word,":",file_ids,"\n")
+    # print(word,":",file_ids,"\n")
     return file_ids
 
 # 跳表指针对应的search_word函数，直接返回一个倒排表字典
@@ -366,6 +366,7 @@ def TF_IDF_search(texts_original,ids,dictionary, inverted_index,id_name,doc):
 # 感觉还是得布尔搜索，只不过全是and而已
 # 如果不用布尔搜索，则需要？
 # 究竟需要在多大的文档集当中检索？感觉可以表示成布尔表达式
+# 这里指的一串句子，不需要输入布尔表达式
 
 def TF_IDF_search_not_bool(texts_original,dictionary, inverted_index,id_name,doc):
     # 对输入的文本进行预处理,即分词和规范化
