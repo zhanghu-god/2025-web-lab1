@@ -20,8 +20,12 @@ def store_id_name(id_name):
     store_json(id_name, ID_NAME_JSON)
 
 def store_inverted_index(inverted_index):
-    store_pickle(inverted_index, INVERTED_INDEX)
-    store_json(inverted_index, INVERTED_INDEX_JSON)
+    if(TEST):
+        store_pickle(inverted_index, INVERTED_INDEX_TEST)
+        store_json(inverted_index, INVERTED_INDEX_TEST_JSON)
+    else:
+        store_pickle(inverted_index, INVERTED_INDEX)
+        store_json(inverted_index, INVERTED_INDEX_JSON)
 
 '''下面是三个索引存储方式'''
 #未压缩直接顺序存储

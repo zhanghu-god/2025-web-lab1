@@ -120,4 +120,31 @@ dictionary_blocking = [
     ),
     #...
 ]
+long_string = "...7systile9syzygetic8syzygial6syzygy11szaibelyite8szczecin..."
 
+"""词典前端编码结构"""
+# 前缀长度 + 第一个单词 + 各个(后缀长度 + 后缀)
+long_string = "7automata1e2ic3ion"
+
+'''
+数据目录结构
+lab1/                               # 数据目录
+├── Data/                           # 原始XML数据
+│   ├── Group/
+│   ├── Event/
+│   ├── RSVPs/
+│   └── Member/
+└── Store/                          # 构建的索引文件
+    ├── dictionary/                 # 词典
+    │    ├── block_size_10          #块大小为10的按块存储
+    │    ├── block_size_25          #块大小为25的按块存储
+    │    ├── ...
+    │    └── dictionary_orin.pkl    # 未压缩顺序存储
+    ├── inverted_index/             # 倒排记录表
+    │    ├── sqrt/                  #跳表步长为sqrt(n)
+    │    ├── skip_step_10/          #设置跳表步长为10
+    │    ├── skip_step_20/          #设置跳表步长为20
+    │    ├── ...
+    │    └── inverted_index_pre.pkl #原始倒排表,包含词典.
+    └── id_name/                    # id-name映射
+'''

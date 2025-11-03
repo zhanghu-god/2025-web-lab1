@@ -56,7 +56,7 @@ class Trie:
 
     #将Trie树转化成按块存储的形式
     def convert_to_blocking(self, block_size):
-        from Blocking import Blocking
+        from index.Blocking import Blocking
         # 提取所有词项及其倒排表位置索引
         words, posting_indexes = [], []
         self.extract_words(self.root, "", words, posting_indexes)
@@ -108,7 +108,7 @@ class Trie:
         return a[:i]
     #将Trie树转化为前段编码存储
     def convert_to_front_coding(self, block_size):
-        from Blocking import FrontCoding
+        from index.Blocking import FrontCoding
         words, posting_indexes = [], []
         self.extract_words(self.root, "", words, posting_indexes)
 

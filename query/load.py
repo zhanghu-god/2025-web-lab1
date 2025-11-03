@@ -1,9 +1,8 @@
 import json
 import pickle
 
-from Trie import Trie
+from index.Trie import Trie
 from config import *
-from report.structure import inverted_index
 
 
 def load_pickle(path):

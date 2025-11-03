@@ -1,9 +1,9 @@
 import math
 
-from Trie import Trie
+from index.Trie import Trie
 from config import *
-from parse_xml import *
-from store import store_list, store_blocking, store_front_coding, store_json, store_pickle
+from index.parse_xml import *
+from index.store import store_list, store_blocking, store_front_coding, store_json, store_pickle
 
 
 def split_index(inverted_index_pre):
@@ -54,8 +54,11 @@ def gen_inverted_index(documents):
         n = len(doc_ids)
         skip_pointers = {}
         if n > 3:
-            #跳表指针步长是根号n
-            skip_step = int(math.sqrt(n))
+            #设置跳表指针步长
+            if TEST:
+                skip_step = SKIP_STEP
+            else:
+                skip_step = int(math.sqrt(n))
             for i in range(0, n, skip_step):
                 if i + skip_step < n:
                     from_doc = doc_ids[i]
@@ -111,8 +114,11 @@ def compress_inverted_index(documents):#压缩倒排表,位置-GAP
         n = len(doc_ids)
         skip_pointers = {}
         if n > 3:
-            #跳表指针步长是根号n
-            skip_step = int(math.sqrt(n))
+            #设置跳表指针步长
+            if TEST:
+                skip_step = SKIP_STEP
+            else:
+                skip_step = int(math.sqrt(n))
             for i in range(0, n, skip_step):
                 if i + skip_step < n:
                     from_doc = doc_ids[i]

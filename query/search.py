@@ -1,9 +1,6 @@
 import math
 
-from Trie import Trie
-from config import DATA_DIR
-from parse_xml import *
-from store import store_list, store_blocking
+from index.parse_xml import *
 
 
 def bool_evaluator(text):

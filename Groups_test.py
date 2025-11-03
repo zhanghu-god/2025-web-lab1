@@ -1,17 +1,9 @@
-import html
-import re
-import sys
-import os
-
 # # 添加 parse_xml.py 所在目录到 Python 路径
 # pro_dir = r"H:\web\lab1\2025-web-lab1"  # 根据实际情况修改路径
 # sys.path.append(pro_dir)
 
-from parse_xml import*
-from config import *
 from gen_inverted_index import *
-from search import *
-from nltk import word_tokenize
+from query.search import *
 
 docs = parse_all(os.path.join(DATA_DIR, "Group"))
 # dictionary, inverted_index, id_name = gen_inverted_index(docs)

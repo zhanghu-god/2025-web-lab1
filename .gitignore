@@ -152,6 +152,6 @@ env/
 *.bak
 
 config.py
-test/
+my_test/
 1.py
 实验1.pdf
