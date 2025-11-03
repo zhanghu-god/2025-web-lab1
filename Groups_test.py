@@ -3,12 +3,18 @@
 # sys.path.append(pro_dir)
 
 from gen_inverted_index import *
+from query.load import load
 from query.search import *
 
-docs = parse_all(os.path.join(DATA_DIR, "Group"))
+docs = parse_all(os.path.join(DATA_DIR, "Event"))
+docs1 = load_pickle(DOCUMENTS)
+if(docs == docs1):
+    print("词典相同")
+
 # dictionary, inverted_index, id_name = gen_inverted_index(docs)
-dictionary, inverted_index, id_name = compress_inverted_index(docs)
-store_list(dictionary, inverted_index, id_name)
+# dictionary, inverted_index, id_name = compress_inverted_index(docs)
+dictionary, inverted_index, id_name = load()
+# store_list(dictionary, inverted_index, id_name)
 
 # text = "back and go"
 
