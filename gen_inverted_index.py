@@ -1,9 +1,11 @@
 import math
+from nltk.corpus.reader import documents
 
 from index.Trie import Trie
 from config import *
 from index.parse_xml import *
-from index.store import store_list, store_blocking, store_front_coding, store_json, store_pickle
+from index.store import store_list, store_blocking, store_front_coding, store_json, store_pickle, store_inverted_index
+from query.load import load_pickle
 
 
 def split_index(inverted_index_pre):
@@ -131,22 +133,20 @@ def compress_inverted_index(documents):#压缩倒排表,位置-GAP
     return dictionary, inverted_index, id_name
 
 if __name__ == "__main__":
-    #找到正确的数据目录
-    file_type="Event"
-    folder = os.path.join(DATA_DIR, file_type)
-    #解析全部文件生成正排表(文档name-tokens)
-    documents = parse_all(folder)
+    # #找到正确的数据目录
+    # file_type="Event"
+    # folder = os.path.join(DATA_DIR, file_type)
+    # #解析全部文件生成正排表(文档name-tokens)
+    # documents = parse_all(folder)
+    documents = load_pickle(DOCUMENTS)
     #生成倒排表同时保存文档id-name映射
     dictionary, inverted_index, id_name= gen_inverted_index(documents)
-    #保存倒排表
+
+    '''保存倒排表'''
     #未压缩直接存储
     store_list(dictionary, inverted_index, id_name)
-    store_blocking(dictionary)
-    store_front_coding(dictionary)
-    # # 打印文档数量
-    # print(f"共处理 {len(documents)} 篇文档")
-    # # 看看第一个文档的 tokens
-    # first_doc = next(iter(documents.items()))
-    # print("示例文档:", first_doc[0])
-    # print("分词结果:", first_doc[1])  # 打印前50个 token
+    # #按块存储
+    # store_blocking(dictionary)
+    # #前端编码存储
+    # store_front_coding(dictionary)
 
