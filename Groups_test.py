@@ -33,6 +33,9 @@ dictionary, inverted_index, id_name = load()
 # text = "(app or ap) and (not pa) or go or back" #例1，注意这里not括号不能省
 # text = "app or ap or pa or go or back" #例2
 # text = "ap and pa"    #例3
+
+
+# text = "app or ap and pa or not back"
 # search_result = bool_search(text, dictionary, inverted_index, id_name)
 # print(search_result,"\n")
 
@@ -44,8 +47,15 @@ dictionary, inverted_index, id_name = load()
 # print(search_result,"\n")
 
 # 短语查询
-text =  "go back"
-search_result = search_phrase(text, dictionary, inverted_index)
-print(search_result,"\n")
+# text =  "go back"
+# search_result = search_phrase(text, dictionary, inverted_index)
+# print(search_result,"\n")
 
 
+# #测试规范化布尔表达式的结果
+# text = "(app or ap and not pa) or (go or back)"
+text = "app or ap and pa or not back"
+text_current = bool_evaluator(text)
+print(text_current)
+result = add_parentheses(text_current)
+print(result)

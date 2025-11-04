@@ -16,9 +16,88 @@ def bool_evaluator(text):
     for word in tokens:
         if word not in stop_words:
             clean_tokens.append(stemmer.stem(word))
-        elif word=='or' or word=='and' or word=='not'and clean_tokens[-1] not in ['or','and','not'] :#暂时每个运算都得带上括号
+        elif word=='or' or word=='and' and clean_tokens[-1] not in ['or','and','not'] :#暂时每个运算都得带上括号
+            clean_tokens.append(word)
+        elif word=='not' and clean_tokens[-1] != 'not' :
             clean_tokens.append(word)
     return clean_tokens
+
+
+def flatten_to_1d(nested_structure):
+    """
+    将嵌套结构转换为一维数组
+    """
+    result = []
+    
+    def flatten(item):
+        if isinstance(item, list):
+            for subitem in item:
+                flatten(subitem)
+        else:
+            result.append(item)
+    
+    flatten(nested_structure)
+    return result
+def add_parentheses(clean_tokens):
+    stack = []
+    output = []
+    for i in range(len(clean_tokens)):
+        if clean_tokens[i]=='(':
+            stack.append(clean_tokens[i])
+        elif clean_tokens[i]==')' :
+            while stack and stack[-1]!='(':
+                output.insert(0,stack.pop())
+            stack.pop()
+            temp = add_parentheses_temp(output)   #再构建一个函数处理output
+            stack.append(temp)
+            output = []
+        else:
+            stack.append(clean_tokens[i])
+    while stack:
+        output.insert(0,stack.pop())
+    result = add_parentheses_temp(output)
+    result = flatten_to_1d(result)
+    return result
+
+
+def add_parentheses_temp(output):
+    """处理括号"""
+    # result = output.copy()
+    for j in range(2):
+        if j == 0:
+            length = len(output)
+            i = 0
+            while i < length:
+                if output[i]=='not':
+                    if type(output[i+1]) == list :
+                        output[i+1] =['( '] + [' not '] + output[i+1] + [' )']
+                    else:
+                        output[i] = ['('] + [output[i]]  +  [output[i+1]] + [')']
+                    del output[i+1]
+                    length -= 1
+                i += 1
+        if j == 1:
+            length = len(output)
+            i = 0
+            while i < length:
+                if output[i]=='and':
+                    if type(output[i-1]) == list and type(output[i+1]) == list:
+                        output[i] =['(']+ output[i-1] + ['and'] + output[i+1] +[')']
+                    elif type(output[i-1]) == list and type(output[i+1]) != list:
+                        output[i] =['(']+ output[i-1] + ['and'] + [output[i+1]] +[')']
+                    elif type(output[i-1]) != list and type(output[i+1]) == list:
+                        output[i] =['(']+ [output[i-1]] + ['and'] + output[i+1] +[')']
+                    else:
+                        output[i] =['(']+ [output[i-1]] + ['and'] + [output[i+1]] +[')']
+                    del output[i-1]
+                    del output[i]
+                    length -= 2
+                i += 1
+    output.insert(0, '(')
+    output.append(')')
+    return output
+
+
 def _build_syntax_tree(tokens):
         # """构建抽象语法树 (使用Shunting-yard算法)"""
         output = []
@@ -80,6 +159,7 @@ def _build_syntax_tree(tokens):
         
         return tree_stack[0] if tree_stack else None
     
+
 
 def search_word(word,dictionary, inverted_index):#word是输入的单个查询单词，这里只返回了倒排表内的id
     posting_index = dictionary.search(word)
@@ -212,7 +292,10 @@ def recursive_search_skip(tree, dictionary, inverted_index, id_name_list):
 
 
 def bool_search(text, dictionary, inverted_index, id_name):#text是输入的查询文本
-    tokens = bool_evaluator(text)
+    clean_tokens = bool_evaluator(text)
+    tokens = add_parentheses(clean_tokens)
+    print(clean_tokens)
+    print(tokens)
     tree = _build_syntax_tree(tokens)
     id_name_list = list(id_name.keys())
     return recursive_search(tree, dictionary, inverted_index, id_name_list)
