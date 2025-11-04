@@ -23,7 +23,8 @@ def bool_evaluator(text):
     return clean_tokens
 
 
-def flatten_to_1d(nested_structure):
+#######下面三个函数负责进一步规范化，通过添加括号，将表达式转化为正确的运算顺序
+def flatten_to_1d(nested_structure): #递归处理，将多维数组转化为一维数组
     """
     将嵌套结构转换为一维数组
     """
@@ -38,6 +39,9 @@ def flatten_to_1d(nested_structure):
     
     flatten(nested_structure)
     return result
+
+# 处理布尔表达式，通过栈递归到不含括号的最大表达式，依次添加括号
+# （添加完成后看作一个整体，以数组整体为一个元素的形式直接存入结果数组，后续添加括号时直接看作一个元素处理）
 def add_parentheses(clean_tokens):
     stack = []
     output = []
@@ -59,6 +63,7 @@ def add_parentheses(clean_tokens):
     result = flatten_to_1d(result)
     return result
 
+#该函数作用为给一个不含括号的表达式添加括号
 
 def add_parentheses_temp(output):
     """处理括号"""
