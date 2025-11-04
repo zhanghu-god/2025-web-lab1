@@ -294,15 +294,16 @@ def recursive_search_skip(tree, dictionary, inverted_index, id_name_list):
 def bool_search(text, dictionary, inverted_index, id_name):#text是输入的查询文本
     clean_tokens = bool_evaluator(text)
     tokens = add_parentheses(clean_tokens)
-    print(clean_tokens)
-    print(tokens)
+    # print(clean_tokens)
+    # print(tokens)
     tree = _build_syntax_tree(tokens)
     id_name_list = list(id_name.keys())
     return recursive_search(tree, dictionary, inverted_index, id_name_list)
 
 
 def bool_search_skip(text, dictionary, inverted_index, id_name):#text是输入的查询文本
-    tokens = bool_evaluator(text)
+    clean_tokens = bool_evaluator(text)
+    tokens = add_parentheses(clean_tokens)
     tree = _build_syntax_tree(tokens)
     id_name_list = list(id_name.keys())
     return recursive_search_skip(tree, dictionary, inverted_index, id_name_list)
