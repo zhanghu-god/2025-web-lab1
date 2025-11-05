@@ -1,5 +1,9 @@
-### 1.文档解析与规范化处理
+## **Web 信息处理实验 1**
+### 小组成员：
+* PB23111655 井旺波
+* 
 
+### 1.文档解析与规范化处理
 **实现文件为 parse_xml.py**
 总体采用NTLK库对文档进行解析和规范化处理
 
@@ -679,17 +683,19 @@ inverted_index = [
                 break
             print(f"Rank {rank}: Document {doc_id} (Score: {score:.16f})")
    ```
-   TF-IDF检测代码如下:
-```python
-# ## TF-IDF 搜索,不需要输入布尔表达式，直接输入句子就行
-while True:
-    text = input("请输入查询：")
-    if text == "###":
-        break
-    # search_result = bool_search(text, dictionary, inverted_index, id_name)
-    # print(search_result,"\n")
-    TF_IDF_search_not_bool(text, dictionary, inverted_index, id_name, docs)
-```
-一次TF-IDF检索的结果：
+10. TF-IDF检测代码如下:
+    ```python
+    # ## TF-IDF 搜索,不需要输入布尔表达式，直接输入句子就行
+    while True:
+        text = input("请输入查询：")
+        if text == "###":
+            break
+        # search_result = bool_search(text, dictionary, inverted_index, id_name)
+        # print(search_result,"\n")
+        TF_IDF_search_not_bool(text, dictionary, inverted_index, id_name, docs)
+    ```
+ * 一次TF-IDF检索的结果：
     <img src="./picture/image-2.png" alt="TF-IDF检索结果" style="zoom:33%;" />
     <img src="./picture/image-3.png" alt="TF-IDF检索结果" style="zoom: 50%;" />
+
+### 实验总结
