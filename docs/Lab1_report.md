@@ -1,8 +1,57 @@
 ## **Web 信息处理实验 1**
 ### 小组成员：
 * PB23111655 井旺波
-* 
-
+* PB23111641 张虎
+### 代码以及数据结构
+1. 代码结构:
+```python
+2025-web-lab1/ 
+├── docs/                           # 文档文件夹 
+│   ├── picture/                    # 报告中使用的图片 
+│   ├── Lab1_report.md              # 实验报告主文件 
+│   └── structure.py                # 结构示例以及统计数据
+│
+├── index/                          # 索引构建相关模块 
+│   ├── Blocking.py                 # 按块存储类
+│   ├── Trie.py                     # Trie树数据结构 
+│   ├── parse_xml.py                # XML文档解析与文本规范化处理 
+│   └── store.py                    # 倒排索引存储相关功能 
+│
+├── query/                          # 查询相关模块 
+│   ├── load.py                     # 加载倒排索引和相关数据结构 
+│   └── search.py                   # 实现布尔检索和向量空间模型检索 
+│
+├── test/                           # 测试相关模块 
+│   ├── 1_compress_index.py         # 测试压缩后的索引在存储空间上与原索引的区别
+│   ├── 2_bool_sequence.py          # 测试布尔表达式的不同处理顺序对时间开支的影响
+│   ├── 3_effi_compress.py          # 测试索引压缩前后在检索效率上的差异
+│   └── 4_diff_skip.py              # 测试不同跳表指针步长对索引效率的影响
+│
+├── gen_inverted_index.py           # 倒排索引生成主程序 
+└── Groups_test.py                  # 查询主程序, 包含各类查询的样例
+```
+2. 数据结构:
+```python
+lab1/                               # 数据目录
+├── Data/                           # 原始XML数据
+│   ├── Group/
+│   ├── Event/
+│   ├── RSVPs/
+│   └── Member/
+└── Store/                          # 构建的索引文件
+    ├── dictionary/                 # 词典
+    │    ├── block_size_10          # 块大小为10的按块存储
+    │    ├── block_size_25          # 块大小为25的按块存储
+    │    ├── ...
+    │    └── dictionary_orin.pkl    # 未压缩顺序存储
+    ├── inverted_index/             # 倒排记录表
+    │    ├── sqrt/                  # 跳表步长为sqrt(n)
+    │    ├── skip_step_10/          # 设置跳表步长为10
+    │    ├── skip_step_20/          # 设置跳表步长为20
+    │    ├── ...
+    │    └── inverted_index_pre.pkl # 原始倒排表,包含词典.
+    └── id_name/                    # id-name映射
+```
 ### 1.文档解析与规范化处理
 **实现文件为 parse_xml.py**
 总体采用NTLK库对文档进行解析和规范化处理
@@ -34,7 +83,7 @@
   }
   ```
 
-* 倒排表构建以及查询时词典的结构都主要是 Trie 树，其结构如下：
+* 倒排表构建以及查询时词典的结构都主要是 Trie 树，其结构示例如下：
   
   <svg width="800" height="450" version="1.1" xmlns="http://www.w3.org/2000/svg">
   	<ellipse stroke="black" stroke-width="1" fill="none" cx="371.5" cy="69.5" rx="30" ry="30"/>
@@ -699,7 +748,7 @@ inverted_index = [
         # print(search_result,"\n")
         TF_IDF_search_not_bool(text, dictionary, inverted_index, id_name, docs)
     ```
- * 一次TF-IDF检索的结果：
+ * 一次TF-IDF检索的结果(打印得分前100个的文档)：
     <img src="./picture/image-2.png" alt="TF-IDF检索结果" style="zoom:33%;" />
     <img src="./picture/image-3.png" alt="TF-IDF检索结果" style="zoom: 50%;" />
 

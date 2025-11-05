@@ -136,15 +136,41 @@ lab1/                               # 数据目录
 │   └── Member/
 └── Store/                          # 构建的索引文件
     ├── dictionary/                 # 词典
-    │    ├── block_size_10          #块大小为10的按块存储
-    │    ├── block_size_25          #块大小为25的按块存储
+    │    ├── block_size_10          # 块大小为10的按块存储
+    │    ├── block_size_25          # 块大小为25的按块存储
     │    ├── ...
     │    └── dictionary_orin.pkl    # 未压缩顺序存储
     ├── inverted_index/             # 倒排记录表
-    │    ├── sqrt/                  #跳表步长为sqrt(n)
-    │    ├── skip_step_10/          #设置跳表步长为10
-    │    ├── skip_step_20/          #设置跳表步长为20
+    │    ├── sqrt/                  # 跳表步长为sqrt(n)
+    │    ├── skip_step_10/          # 设置跳表步长为10
+    │    ├── skip_step_20/          # 设置跳表步长为20
     │    ├── ...
-    │    └── inverted_index_pre.pkl #原始倒排表,包含词典.
+    │    └── inverted_index_pre.pkl # 原始倒排表,包含词典.
     └── id_name/                    # id-name映射
+    
+    
+2025-web-lab1/ 
+├── docs/                           # 文档文件夹 
+│   ├── picture/                    # 报告中使用的图片 
+│   ├── Lab1_report.md              # 实验报告主文件 
+│   └── structure.py                # 结构示例以及统计数据
+│
+├── index/                          # 索引构建相关模块 
+│   ├── Blocking.py                 # 按块存储类
+│   ├── Trie.py                     # Trie树数据结构 
+│   ├── parse_xml.py                # XML文档解析与文本规范化处理 
+│   └── store.py                    # 倒排索引存储相关功能 
+│
+├── query/                          # 查询相关模块 
+│   ├── load.py                     # 加载倒排索引和相关数据结构 
+│   └── search.py                   # 实现布尔检索和向量空间模型检索 
+│
+├── test/                           # 测试相关模块 
+│   ├── 1_compress_index.py         # 测试压缩后的索引在存储空间上与原索引的区别
+│   ├── 2_bool_sequence.py          # 测试布尔表达式的不同处理顺序对时间开支的影响
+│   ├── 3_effi_compress.py          # 测试索引压缩前后在检索效率上的差异
+│   └── 4_diff_skip.py              # 测试不同跳表指针步长对索引效率的影响
+│
+├── gen_inverted_index.py           # 倒排索引生成主程序 
+└── Groups_test.py                  # 查询主程序, 包含各类查询的样例
 '''
