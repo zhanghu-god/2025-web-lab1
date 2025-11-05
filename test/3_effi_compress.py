@@ -1,5 +1,7 @@
 """
 比较索引压缩前后在检索效率上的差异
+压缩前:词典是 Trie 树结构
+压缩后词典是 Blocking 结构
 """
 
 import statistics

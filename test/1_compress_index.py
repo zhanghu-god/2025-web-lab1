@@ -6,7 +6,8 @@
 3. 前端编码存储
 """
 import os
-from config import DICTIONARY_ORIN, BLOCK_SIZE, DICTIONARY_BLOCKING, DICTIONARY_FrontCoding
+from config import DICTIONARY_ORIN, BLOCK_SIZE, DICTIONARY_BLOCKING, DICTIONARY_FrontCoding, BASE_PATH
+
 
 def get_file_size(file_path):
     """获取文件大小"""
@@ -28,6 +29,12 @@ def format_size(file_path):
     return f"{size_bytes:.2f} {size_names[i]}"
 
 if __name__ == "__main__":
-    print(f"顺序存储的词典大小:\t\t\t\t\t" + format_size(DICTIONARY_ORIN))
-    print(f"按块存储的词典大小(block_size = {BLOCK_SIZE}):\t" + format_size(DICTIONARY_BLOCKING))
-    print(f"前端编码存储的词典大小(block_size = {BLOCK_SIZE}):" + format_size(DICTIONARY_FrontCoding))
+    block_size = [25, 75, 100]
+    print(f"顺序存储的词典大小:\t" + format_size(DICTIONARY_ORIN))
+    for i in block_size:
+        print()
+        PATH_blocking = fr"{BASE_PATH}\dictionary\block_size_{i}\dictionary_blocking.pkl"
+        PATH_FrontCoding = fr"{BASE_PATH}\dictionary\block_size_{i}\dictionary_frontCoding.pkl"
+        print(f"block_size={i} 时:")
+        print(f"按块存储的词典大小:\t" + format_size(PATH_blocking))
+        print(f"前端编码存储的词典大小:\t" + format_size(PATH_FrontCoding))
