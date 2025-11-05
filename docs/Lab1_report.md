@@ -14,6 +14,7 @@
     1. 去除特殊符号
     1. 分词
     1. 词干化
+
 ### 2.倒排表的构建
 
 **实现文件为 gen_inverted_index.py,Trie.py**
@@ -108,7 +109,7 @@ inverted_index = [
    * 具体操作与gen_inverted_index(documents)一致，只在存入位置信息时做了修改，改为了存储间隔。
 4. 通过split_index(inverted_index_pre)函数将初步生成的结果分成两个部分，即词典和倒排表。（inverted_index_pre当中仍然通过token进行索引，通过该函数可以实现拆分，使得字典当中存储的是token以及其对应的倒排索引，而倒排表当中存储的是则完全是倒排索引所对应的词项位置信息）
 
-### 3.倒排表的扩展与优化 [
+### 3.倒排表的扩展与优化
 
 #### 1.在倒排表中加入词项的位置信息，以应对短语检索需求。
 
@@ -288,6 +289,7 @@ inverted_index = [
 3. 将规范好的文本转换为后缀表达式（逆波兰表达式）
 2. 将逆波兰表达式转换为布尔查询树
    函数：
+   
     ```python
     def _build_syntax_tree(tokens):
            # """构建布尔查询树 (使用Shunting-yard算法)"""
@@ -349,6 +351,7 @@ inverted_index = [
     注意3、4的实现都需要使用栈来保证正确的顺序，且3、4的都在函数_build_syntax_tree(tokens)中实现
 5. 递归算法遍历布尔查询树，输出检索结果。
     函数：
+    
     ```python
     def recursive_search_skip(tree, dictionary, inverted_index, id_name_list):
     # """递归计算布尔表达式语法树"""
@@ -384,6 +387,7 @@ inverted_index = [
     ```
     应当注意到跳表指针只在两个单一词项进行合并操作时才会起作用，因此计算方式如下：
     （这里有两种and操作，一个是使用跳表指针时的and操作，一个是其他情况的and操作，由于使用了set()函数，但是AND_SKIP函数会返回倒排表，无法作为set()的参数，因此上面的搜索函数会在检测到不适用跳表指针情况是将倒排表转化为列表）
+    
     ```python
         # 直接返回一个倒排表字典，即搜索出word所对应的倒排表
         def search_word_skip(word,dictionary, inverted_index):
@@ -448,6 +452,7 @@ inverted_index = [
     **注意这里的测试都是经过多次循环取中位数的获得的结果，从而降低其他因素引起的时间波动对结果的影响**
    （1） 分析同一个布尔表达式的不同处理顺序对时间开支的影响。
    举例测试代码如下：
+   
    ```python
     docs = load_pickle(DOCUMENTS)
     dictionary, inverted_index, id_name = load()
