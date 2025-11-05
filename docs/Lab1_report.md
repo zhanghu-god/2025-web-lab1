@@ -108,7 +108,7 @@ inverted_index = [
    * 具体操作与gen_inverted_index(documents)一致，只在存入位置信息时做了修改，改为了存储间隔。
 4. 通过split_index(inverted_index_pre)函数将初步生成的结果分成两个部分，即词典和倒排表。（inverted_index_pre当中仍然通过token进行索引，通过该函数可以实现拆分，使得字典当中存储的是token以及其对应的倒排索引，而倒排表当中存储的是则完全是倒排索引所对应的词项位置信息）
 
-### 3.倒排表的扩展与优化 [todo3]
+### 3.倒排表的扩展与优化 [
 
 #### 1.在倒排表中加入词项的位置信息，以应对短语检索需求。
 
@@ -199,7 +199,7 @@ inverted_index = [
         elif word=='not' and clean_tokens[-1] != 'not' :
             clean_tokens.append(word)
     return clean_tokens
-    ```
+   ```
 2. 根据规范化好的文段进行进一步规范，通过增加括号的方式来明确布尔查询各种运算词之间的优先级。（后续只需要识别括号的优先级就可以了）
 函数：
 * 处理数组嵌套
@@ -287,7 +287,7 @@ inverted_index = [
     ```
 3. 将规范好的文本转换为后缀表达式（逆波兰表达式）
 2. 将逆波兰表达式转换为布尔查询树
-函数：
+   函数：
     ```python
     def _build_syntax_tree(tokens):
            # """构建布尔查询树 (使用Shunting-yard算法)"""
@@ -313,11 +313,11 @@ inverted_index = [
                        # 'parent': None,
                        'value': [token]
                        })
-
+   
            # 弹出剩余运算符
            while stack:
                output.append(stack.pop())
-
+   
         #处理后缀表达式，构建查询树
            tree_stack = []
            for elem in output:
@@ -343,7 +343,7 @@ inverted_index = [
                    })
                    # left.parent = tree_stack[-1]
                    # right.parent = tree_stack[-1]
-
+   
            return tree_stack[0] if tree_stack else None
     ```
     注意3、4的实现都需要使用栈来保证正确的顺序，且3、4的都在函数_build_syntax_tree(tokens)中实现
@@ -437,10 +437,10 @@ inverted_index = [
                 if i >= length_1-1 or j >= length_2-1:
                     break
             return results_ids
-
+    
         def OR(arr1, arr2):
         return list(set(arr1) | set(arr2))
-
+    
         def NOT(arr1, arr2):#返回arr1中有arr2中没有的元素
             return list(set(arr1) - set(arr2))
     ```
@@ -451,25 +451,25 @@ inverted_index = [
    ```python
     docs = load_pickle(DOCUMENTS)
     dictionary, inverted_index, id_name = load()
-
+   
     ids_word_1 = search_word('app', dictionary, inverted_index)
     ids_word_2 = search_word('go', dictionary, inverted_index)
     ids_word_3 = search_word('back', dictionary, inverted_index)
-
+   
     print("app_ids_length:",len(ids_word_1))
     print("go_ids_length:",len(ids_word_2))
     print("back_ids_length:",len(ids_word_3))
-
+   
     text_1 = "go and back and app"
     text_2 = "app and back and go"
-
+   
     time_1_skip = []
     for i in range(500):
         start = time.perf_counter()
         search_result_1_skip = bool_search_skip(text_1, dictionary, inverted_index, id_name)
         end = time.perf_counter()
         time_1_skip.append(end - start)
-
+   
     time_2_skip = []
     for i in range(500):
         start = time.perf_counter()
@@ -484,11 +484,12 @@ inverted_index = [
     # print("bool_search_skip_result_2:",search_result_2_skip)
     ```
    结果如图:
-   ![alt text](image-1.png)
+   ![alt text](./picture/image-1.png)
    分析： 
     按照每个word的查询结果从小到大执行结果的合并操作时，检索效率最高。因为and本质上就是倒排表的合并操作，合并的倒排表越小，效率越高，而且后续获得的中间结果也会较小，进一步使得之后的每次合并都会有较高的合并效率。
-   （2） 选择不同的跳表指针步长，并分析其对存储性能/检索效率的影响。
+   （2) 选择不同的跳表指针步长，并分析其对存储性能/检索效率的影响。
    举例测试代码如下：
+
    ```python
     text = "(app and ap) and (op and p) or (go and back) and (close and home)"
     SKIP_STEP = [5,10, 15, 20, 25, 30, 40, 50]
@@ -517,7 +518,7 @@ inverted_index = [
         time_1.append(end_time - start_time)
     print("跳表指针步长为：sqrt(n)","\n","索引检索耗时：", statistics.median(time_1))
     # print("索引检索结果：", search_result)
-    ```
+   ```
    结果如图：
    ![alt text](./picture/image.png)
    分析：
@@ -590,7 +591,7 @@ inverted_index = [
                 # tf_text[id] = float(text_len)
                 # tf_text[id] = 0.5*float(text_len)/float(id_len) + 0.5*float(text_len)
         return tf_text
-        ```
+    ```
 5. 计算TF-IDF
    代码如下：
    ```python
@@ -602,7 +603,7 @@ inverted_index = [
         tf_idf = tf_text[id] * text_idf#每个文档对应的tf-idf,
         return tf_idf
     
-    ```
+   ```
 6. 采用计算余弦相似度的方式来计算文档之间的相似度
    代码如下：
    ```python
@@ -622,7 +623,7 @@ inverted_index = [
         return 0.0
     
     return dot_product / (magnitude1 * magnitude2)
-    ```
+   ```
 7. 为每个文档构建的TF-IDF向量
 8. 计算输入文段对应的TF-IDF向量
 9. 给文档按相似度降序排序，输出前100个结果,不够100就输出所有结果
@@ -634,16 +635,16 @@ inverted_index = [
         # 对输入的文本进行预处理,即分词和规范化
         # 有没有这一步其实都行，反正提前布尔检索已经规范化过了
         texts = normalize_text(texts_original)
-
+   
         word_texts_tf = compute_texts_tf(texts)
-
+   
         if not ids:  # 如果输入的文本为空，则返回空字典
             return print("No results found.")
-
+   
         tf_idf = 0
         vec = {}
         vec_search = []
-
+   
         # 7.为每个文档构建的TF-IDF向量，注意输入文本在删去重复单词之后的长度就是向量长度，这里用is_first_occurrence来判断一个单词是否已经出现过
         for id in ids:
             vec[id]=[]
@@ -677,6 +678,18 @@ inverted_index = [
             if rank > 100:
                 break
             print(f"Rank {rank}: Document {doc_id} (Score: {score:.16f})")
-    ```
-    一次TF-IDF检索的结果：
-    ![TF-IDF检索结果](5.1.jpg)
+   ```
+   TF-IDF检测代码如下:
+```python
+# ## TF-IDF 搜索,不需要输入布尔表达式，直接输入句子就行
+while True:
+    text = input("请输入查询：")
+    if text == "###":
+        break
+    # search_result = bool_search(text, dictionary, inverted_index, id_name)
+    # print(search_result,"\n")
+    TF_IDF_search_not_bool(text, dictionary, inverted_index, id_name, docs)
+```
+一次TF-IDF检索的结果：
+    <img src="./picture/image-2.png" alt="TF-IDF检索结果" style="zoom:33%;" />
+    <img src="./picture/image-3.png" alt="TF-IDF检索结果" style="zoom: 50%;" />
