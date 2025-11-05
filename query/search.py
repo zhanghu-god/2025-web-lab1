@@ -315,8 +315,12 @@ def bool_search_skip(text, dictionary, inverted_index, id_name):#text是输入�
 
 
 
-####TF-IDF
-def count_words(doc,id,id_name):#计算文档总的含词数
+####TF-IDF##########
+
+
+
+#计算文档总的含词数
+def count_words(doc,id,id_name):
     count = 0
     for word in doc[id_name[id]]:
         count += 1
@@ -337,8 +341,10 @@ def compute_tf(text,dictionary, inverted_index,id_name,doc,id):
     else:
             text_len = len(inverted_index[position_index][0][id])
             id_len = count_words(doc,id,id_name)
-            tf_text[id] = float(text_len)/float(id_len)
+            tf_text[id] = math.log10(float(text_len)) + 1
+            # tf_text[id] = float(text_len)/float(id_len)
             # tf_text[id] = float(text_len)
+            # tf_text[id] = 0.5*float(text_len)/float(id_len) + 0.5*float(text_len)
     return tf_text
 
 def cosine_similarity(vec1, vec2):
@@ -398,7 +404,8 @@ def compute_texts_tf(texts):
     for word in count:
         # temp = float(count[word])/float(len_texts)
         # temp = float(count[word])
-        temp = float(count[word])*0.5+float(count[word])/float(len_texts)
+        # temp = float(count[word])*0.5+float(count[word])/float(len_texts)
+        temp = math.log10(float(count[word])) + 1
         word_tf[word] = temp
     return word_tf
 
@@ -407,9 +414,9 @@ def compute_texts_tf(texts):
 
 #注意这里需要bool的最终搜索结果来确定需要参与计算的文档长度
 #对一定的文档集合进行检索
-
 def TF_IDF_search(texts_original,ids,dictionary, inverted_index,id_name,doc):
     # 对输入的文本进行预处理,即分词和规范化
+    # 有没有这一步其实都行，反正提前布尔检索已经规范化过了
     texts = normalize_text(texts_original)
 
     word_texts_tf = compute_texts_tf(texts)
@@ -420,20 +427,23 @@ def TF_IDF_search(texts_original,ids,dictionary, inverted_index,id_name,doc):
     tf_idf = 0
     vec = {}
     vec_search = []
+
     for id in ids:
         vec[id]=[]
+        is_first_occurrence = []
         for text in texts:
-            tf_idf=compute_tf_idf(text,id,doc,dictionary, inverted_index,id_name)
-            vec[id].append(tf_idf)
-    for text in texts:
-        idf_search = compute_idf(doc,text,dictionary, inverted_index)
-        #三种情况都可以
-        ##有点问题，需要计算重复的词
-        # tf_search = float(1)/float(len(texts))#即搜索词在搜索文本中的词频
-        # tf_search = float(1)
-        # tf_search = 0.5*float(1) + 0.5*float(1)/float(len(text))
-        tf_search = word_texts_tf[text]
-        vec_search.append(idf_search*tf_search)
+            if text not in is_first_occurrence:
+                is_first_occurrence.append(text)
+                tf_idf=compute_tf_idf(text,id,doc,dictionary, inverted_index,id_name)
+                vec[id].append(tf_idf)
+    is_first_occurrence = []
+    for text in texts:# 计算搜索文本的TF-IDF向量
+        if text not in is_first_occurrence:
+            is_first_occurrence.append(text)
+            idf_search = compute_idf(doc,text,dictionary, inverted_index)
+            tf_search = word_texts_tf[text]
+            vec_search.append(idf_search*tf_search)
+    print(vec_search,"\n")
     results = {}
     for id in ids:
         sim = cosine_similarity(vec[id],vec_search)
@@ -478,9 +488,9 @@ def TF_IDF_search_not_bool(texts_original,dictionary, inverted_index,id_name,doc
         i+=1
         if i<len_texts:
             texts+= " or " ##这里需要的是and还是or
-    print(texts)
+    # print(texts)
     ids = bool_search(texts,dictionary, inverted_index, id_name)
-    print(ids)
+    # print(ids)
     TF_IDF_search(texts_original,ids,dictionary, inverted_index,id_name,doc)
 
 

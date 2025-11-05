@@ -18,13 +18,13 @@ dictionary, inverted_index, id_name = load()
 
 
 # ## TF-IDF 搜索,不需要输入布尔表达式，直接输入句子就行
-# while True:
-#     text = input("请输入查询：")
-#     if text == "###":
-#         break
-#     search_result = bool_search(text, dictionary, inverted_index, id_name)
-#     print(search_result,"\n")
-#     TF_IDF_search_not_bool(text, dictionary, inverted_index, id_name, docs)
+while True:
+    text = input("请输入查询：")
+    if text == "###":
+        break
+    # search_result = bool_search(text, dictionary, inverted_index, id_name)
+    # print(search_result,"\n")
+    TF_IDF_search_not_bool(text, dictionary, inverted_index, id_name, docs)
 
 
 
@@ -54,8 +54,8 @@ dictionary, inverted_index, id_name = load()
 
 # #测试规范化布尔表达式的结果
 # text = "(app or ap and not pa) or (go or back)"
-text = "app or ap and pa or not back"
-text_current = bool_evaluator(text)
-print(text_current)
-result = add_parentheses(text_current)
-print(result)
+# text = "app or ap and pa or not back"
+# text_current = bool_evaluator(text)
+# print(text_current)
+# result = add_parentheses(text_current)
+# print(result)
