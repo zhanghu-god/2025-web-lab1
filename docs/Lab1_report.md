@@ -182,6 +182,10 @@ inverted_index = [
 
 **实现文件为 search.py**
 
+* **值得注意的是，由于词干化工具会直接根据后缀去改变，这将导致某些词例如'tos','toed'在经过词干化处理后，会变为停用词'to'，这种结果会导致短语检索可能出现少部分的错误搜索结果。**
+* **另外，由于搜索逻辑是基于单词的词干化结果进行的，单词搜索当中也可能出现错误，如上例当中，搜索'tos',最终结果当中也会包含'toed'的搜索结果，即当两个词在词干化后为同一个词根时，可能会导致搜索结果比正确结果多出一些错误的文档选项。**
+* **当然以上问题出现概率较小，错误文档占全部结果的比例也很小，可以忽略，而且此时也可以通过TF-IDF向量空间模型为文档评分，来输出相似度更高的文档以求进一步优化结果。（将想要检索的多个单词组合成一些句子，进行TF-IDF处理，来获取更加可靠的结果）**
+
 #### 1.布尔检索
 1. 处理输入文段，对其进行规范化处理，这里保留'and'、'or'、'not'（三个词在停用词表中，不能删除），同时保留括号
    ```python
@@ -537,6 +541,7 @@ inverted_index = [
          1. 检索短语中的所有单词都同时出现的文档
          2. 遍历获得的文档集，在每个文档中对单词位置信息进行确认，从而确定是否确实存在短语
    * 短语搜索代码：
+
     ```python
     def evaluator(text):
     #小写
@@ -551,7 +556,7 @@ inverted_index = [
     for word in tokens:
         clean_tokens.append(stemmer.stem(word))#词干化
     return clean_tokens
-
+    
     def search_phrase(text,dictionary, inverted_index):
     tokens = evaluator(text)
     ids = []
@@ -598,11 +603,13 @@ inverted_index = [
         text =  "close to"
         search_result = search_phrase(text, dictionary, inverted_index)
         print(search_result,"\n")
+
     ```
    * 结果如下：
-   ![alt text](./picture/image-4.png)
+      ![alt text](./picture/image-4.png)
    * 分析：
-    扩展倒排表通过加入了词项在文档当中的位置信息，使得输入短语时能够通过比较短语中各个单词的相对位置来确定短语所在的文档信息，使得短语检索的逻辑更加简单清晰，算法设计也更加容易。
+        * 扩展倒排表通过加入了词项在文档当中的位置信息，使得输入短语时能够通过比较短语中各个单词的相对位置来确定短语所在的文档信息，使得短语检索的逻辑更加简单清晰，算法设计也更加容易。
+
 
 
 
