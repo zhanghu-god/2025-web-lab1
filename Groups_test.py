@@ -18,13 +18,13 @@ dictionary, inverted_index, id_name = load()
 
 
 # ## TF-IDF 搜索,不需要输入布尔表达式，直接输入句子就行
-while True:
-    text = input("请输入查询：")
-    if text == "###":
-        break
-    # search_result = bool_search(text, dictionary, inverted_index, id_name)
-    # print(search_result,"\n")
-    TF_IDF_search_not_bool(text, dictionary, inverted_index, id_name, docs)
+# while True:
+#     text = input("请输入查询：")
+#     if text == "###":
+#         break
+#     # search_result = bool_search(text, dictionary, inverted_index, id_name)
+#     # print(search_result,"\n")
+#     TF_IDF_search_not_bool(text, dictionary, inverted_index, id_name, docs)
 
 
 
@@ -46,8 +46,12 @@ while True:
 # search_result = bool_search_skip(text, dictionary, inverted_index, id_name)
 # print(search_result,"\n")
 
+ids = search_word('to', dictionary, inverted_index)
+print(len(ids))
+print(ids)
+
 # 短语查询
-# text =  "go back"
+# text =  "close to"
 # search_result = search_phrase(text, dictionary, inverted_index)
 # print(search_result,"\n")
 

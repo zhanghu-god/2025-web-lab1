@@ -556,6 +556,7 @@ def search_phrase(text,dictionary, inverted_index):
                 # print("id:",id,"\n")
                 result_ids.append(id)
                 break
+    return  result_ids
     # print("text:",text,"\n")
     # print("tokens:",tokens,"\n")
     # print("position_index:",position_index,"\n")
@@ -564,7 +565,6 @@ def search_phrase(text,dictionary, inverted_index):
     # print("flag:",flag,"\n")
     # print("count:",count,"\n")
     # print("短语搜索结果：",result_ids)
-    return  result_ids
 
 
 

@@ -545,7 +545,7 @@ inverted_index = [
    ![alt text](./picture/image-1.png)
    分析： 
     按照每个word的查询结果从小到大执行结果的合并操作时，检索效率最高。因为and本质上就是倒排表的合并操作，合并的倒排表越小，效率越高，而且后续获得的中间结果也会较小，进一步使得之后的每次合并都会有较高的合并效率。
-   （2) 选择不同的跳表指针步长，并分析其对存储性能/检索效率的影响。
+   （2）选择不同的跳表指针步长，并分析其对存储性能/检索效率的影响。
    举例测试代码如下：
 
    ```python
@@ -583,6 +583,80 @@ inverted_index = [
    * 步长过小：每次比较的代价较小，跳跃之后再次返回的可能性较小，但是跳跃步长太小，导致跳跃次数增多，检索效率下降
    * 步长过大：虽然跳跃步数少，但每次比较的代价增加，跳跃之后再次返回的可能性增大
    * 因此需要找到步长的平衡点来平衡跳跃次数和跳跃之后的返回可能性，进而得到最佳的检索效率
+
+（3）一次短语搜索的尝试
+   * 短语搜索逻辑：
+      * 通过evaluator(text)函数规范化输入文本，由于文本为短语，因此采用不删除停用词的规范化处理
+      * 通过search_phrase(text,dictionary, inverted_index)函数进行短语检索，总体上分为两步
+         1. 检索短语中的所有单词都同时出现的文档
+         2. 遍历获得的文档集，在每个文档中对单词位置信息进行确认，从而确定是否确实存在短语
+   * 短语搜索代码：
+    ```python
+    def evaluator(text):
+    #小写
+    text=text.lower()
+    # 去掉特殊符号（保留单词和空格,和括号）
+    text = html.unescape(text)  # 转回 <p>Our purpose:</p>
+    text = re.sub(r"<.*?>", "", text)  # 去掉 <p> 和 </p>
+    text = re.sub(r"[^a-z\s()]", " ",  text) #把除了字母和空白符号的其他符号换成空格
+    # 分词
+    tokens = word_tokenize(text)#分词
+    clean_tokens = []
+    for word in tokens:
+        clean_tokens.append(stemmer.stem(word))#词干化
+    return clean_tokens
+
+    def search_phrase(text,dictionary, inverted_index):
+    tokens = evaluator(text)
+    ids = []
+    count = 0 #计数，计算短语中单词的个数
+    for word in tokens:
+        ids_text = search_word(word,dictionary, inverted_index) #问题1：无法使用跳表指针，只有都是倒排表才能用
+        if ids_text == []:
+            print("没有找到该短语")
+            return []
+        elif count == 0:
+            ids = ids_text
+            count += 1
+        else:
+            count += 1
+            ids = AND(ids,ids_text)
+    #汇总了同时含有短语所有单词的文档
+    result_ids = []
+    position_index = []
+    for word in tokens:
+        position_index.append(dictionary.search(word))
+    for id in ids:
+        # print("id:",id,"\n")
+        for position in inverted_index[position_index[0]][0][id]:
+            # print("position:",position,"\n")
+            flag = 0
+            for i in range(1,count,1):#注意这里不包含右边界
+                if(position+i not in inverted_index[position_index[i]][0][id]):
+                    # print("closer对应的文档位置",inverted_index[position_index[i-1]][0][id],"\n")
+                    # print("to对应的文档位置",inverted_index[position_index[i]][0][id],"\n")
+                    break
+                else:
+                    flag += 1
+            # print("flag：",flag,"\n")
+            if flag == count-1:
+                # print("flag：",flag,"\n")
+                # print("id:",id,"\n")
+                result_ids.append(id)
+                break
+    return  result_ids
+    ```
+   * 测试代码：
+     ```python
+        # 短语查询
+        text =  "close to"
+        search_result = search_phrase(text, dictionary, inverted_index)
+        print(search_result,"\n")
+    ```
+   * 结果如下：
+   ![alt text](./picture/image-4.png)
+   * 分析：
+    扩展倒排表通过加入了词项在文档当中的位置信息，使得输入短语时能够通过比较短语中各个单词的相对位置来确定短语所在的文档信息，使得短语检索的逻辑更加简单清晰，算法设计也更加容易。
 
 
 
@@ -753,3 +827,9 @@ inverted_index = [
     <img src="./picture/image-3.png" alt="TF-IDF检索结果" style="zoom: 50%;" />
 
 ### 实验总结
+1. 通过本次实验，进行了分词和规范化文本的尝试，学会了使用nltk库，python函数等方式处理文本的操作。
+2. 成功构建了倒排表和正排表，加深了对倒排表和正排表结构的了解。
+3. 设置了多种存储方式：
+   * 字典：Trie树存储、顺序存储，前端编码、按块存储等以及对应的解压缩方式。
+   * 倒排表的扩展：加入词项在文档中的位置信息，并尝试了使用间隔信息代替位置信息的存储方式。
+4. 尝试了多种索引方式，如布尔索引、TF-IDF检索、以及短语搜索。了解了到排表索引信息的相关原理，同时也通过检测多个索引文本分析了解了索引文本设计，跳表指针，索引压缩等对索引效率的影响。
