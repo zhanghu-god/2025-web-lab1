@@ -519,7 +519,7 @@ inverted_index = [
     # print("索引检索结果：", search_result)
     ```
    结果如图：
-   ![alt text](image.png)
+   ![alt text](./picture/image.png)
    分析：
    * 步长过小：每次比较的代价较小，跳跃之后再次返回的可能性较小，但是跳跃步长太小，导致跳跃次数增多，检索效率下降
    * 步长过大：虽然跳跃步数少，但每次比较的代价增加，跳跃之后再次返回的可能性增大
