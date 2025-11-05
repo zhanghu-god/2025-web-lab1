@@ -46,10 +46,14 @@ dictionary, inverted_index, id_name = load()
 # search_result = bool_search_skip(text, dictionary, inverted_index, id_name)
 # print(search_result,"\n")
 
+ids = search_word('to', dictionary, inverted_index)
+print(len(ids))
+print(ids)
+
 # 短语查询
-text =  "close to"
-search_result = search_phrase(text, dictionary, inverted_index)
-print(search_result,"\n")
+# text =  "close to"
+# search_result = search_phrase(text, dictionary, inverted_index)
+# print(search_result,"\n")
 
 
 # #测试规范化布尔表达式的结果
