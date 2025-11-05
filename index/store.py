@@ -16,16 +16,18 @@ def store_json(file,path):
         json.dump(file, f, ensure_ascii=False, indent=2)
 
 def store_id_name(id_name):
-    store_pickle(id_name, ID_NAME)
-    store_json(id_name, ID_NAME_JSON)
+    store_pickle(id_name, ID_NAME_STOP_WORDS)
+    store_json(id_name, ID_NAME_STOP_WORDS_JSON)
+    print("存储id-name成功")
 
 def store_inverted_index(inverted_index):
     if(TEST):
         store_pickle(inverted_index, INVERTED_INDEX_TEST)
         store_json(inverted_index, INVERTED_INDEX_TEST_JSON)
     else:
-        store_pickle(inverted_index, INVERTED_INDEX)
-        store_json(inverted_index, INVERTED_INDEX_JSON)
+        store_pickle(inverted_index, INVERTED_INDEX_STOP_WORDS)
+        # store_json(inverted_index, INVERTED_INDEX_JSON)
+        print("存储倒排表成功")
 
 '''下面是三个索引存储方式'''
 #未压缩直接顺序存储
@@ -33,8 +35,9 @@ def store_list(dictionary, inverted_index, id_name):
     store_inverted_index(inverted_index)
     store_id_name(id_name)
     words, posting_indexes = dictionary.convert_to_list()
-    store_pickle((words, posting_indexes), DICTIONARY_ORIN)
-    store_json((words, posting_indexes), DICTIONARY_ORIN_JSON)
+    store_pickle((words, posting_indexes), DICTIONARY_STOP_WORDS)
+    print("存储词典成功")
+    # store_json((words, posting_indexes), DICTIONARY_ORIN_JSON)
 
 #按块存储
 def store_blocking(dictionary):

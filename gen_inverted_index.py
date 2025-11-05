@@ -133,15 +133,21 @@ def compress_inverted_index(documents):#压缩倒排表,位置-GAP
     return dictionary, inverted_index, id_name
 
 if __name__ == "__main__":
-    # #找到正确的数据目录
-    # file_type="Event"
-    # folder = os.path.join(DATA_DIR, file_type)
+    #找到正确的数据目录
+    file_type="Event"
+    folder = os.path.join(DATA_DIR, file_type)
     # #解析全部文件生成正排表(文档name-tokens)
     # documents = parse_all(folder)
-    documents = load_pickle(DOCUMENTS)
+    # documents = load_pickle(DOCUMENTS)
+
+    #生成包含停用词的倒排表
+    documents = parse_all_full(folder)
+    store_json(documents, DOCUMENTS_WITH_STOP_WORDS_JSON)
+    store_pickle(documents, DOCUMENTS_WITH_STOP_WORDS)
+    print("生成documents完成")
     #生成倒排表同时保存文档id-name映射
     dictionary, inverted_index, id_name= gen_inverted_index(documents)
-
+    print("生成倒排表完成")
     '''保存倒排表'''
     #未压缩直接存储
     store_list(dictionary, inverted_index, id_name)

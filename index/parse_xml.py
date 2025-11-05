@@ -53,7 +53,7 @@ def normalize_text_full(text):
         stemmer.stem(word) for word in tokens
     ]
     return clean_tokens
-
+# 解析全部文件去除停用词
 def parse_all(folder):
     docs = {}
     for filename in os.listdir(folder):
@@ -67,7 +67,7 @@ def parse_all(folder):
         except Exception as e:
             print(f"解析 {filename} 出错: {e}")
     return docs
-
+# 解析全部文件包含停用词
 def parse_all_full(folder):
     docs = {}
     for filename in os.listdir(folder):

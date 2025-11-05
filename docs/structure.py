@@ -172,5 +172,5 @@ lab1/                               # 数据目录
 │   └── 4_diff_skip.py              # 测试不同跳表指针步长对索引效率的影响
 │
 ├── gen_inverted_index.py           # 倒排索引生成主程序 
-└── Groups_test.py                  # 查询主程序, 包含各类查询的样例
+└── Event_test.py                  # 查询主程序, 包含各类查询的样例
 '''

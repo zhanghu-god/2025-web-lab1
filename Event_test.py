@@ -14,7 +14,7 @@ from query.load import *
 
 ## load加载索引数据
 docs = load_pickle(DOCUMENTS)
-dictionary, inverted_index, id_name = load()
+dictionary, inverted_index, id_name = load_stop()
 
 
 # ## TF-IDF 搜索,不需要输入布尔表达式，直接输入句子就行
@@ -46,14 +46,14 @@ dictionary, inverted_index, id_name = load()
 # search_result = bool_search_skip(text, dictionary, inverted_index, id_name)
 # print(search_result,"\n")
 
-ids = search_word('to', dictionary, inverted_index)
-print(len(ids))
-print(ids)
+# ids = search_word('to', dictionary, inverted_index)
+# print(len(ids))
+# print(ids)
 
 # 短语查询
-# text =  "close to"
-# search_result = search_phrase(text, dictionary, inverted_index)
-# print(search_result,"\n")
+text =  ("go home")
+search_result = search_phrase(text, dictionary, inverted_index)
+print(search_result,"\n")
 
 
 # #测试规范化布尔表达式的结果
