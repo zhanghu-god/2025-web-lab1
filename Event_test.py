@@ -51,7 +51,7 @@ dictionary, inverted_index, id_name = load_stop()
 # print(ids)
 
 # 短语查询
-text =  ("go home")
+text =  ("to be or not to be")
 search_result = search_phrase(text, dictionary, inverted_index)
 print(search_result,"\n")
 

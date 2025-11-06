@@ -2,9 +2,13 @@
 ### 小组成员：
 * PB23111655 井旺波
 * PB23111641 张虎
+
+代码和索引文件链接：https://pan.ustc.edu.cn/share/index/a32e0b64bcc8464d892b
+
 ### 代码以及数据结构
+
 1. 代码结构:
-```python
+```
 2025-web-lab1/ 
 ├── docs/                           # 文档文件夹 
 │   ├── picture/                    # 报告中使用的图片 
@@ -31,7 +35,7 @@
 └── Groups_test.py                  # 查询主程序, 包含各类查询的样例
 ```
 2. 数据结构:
-```python
+```
 lab1/                               # 数据目录
 ├── Data/                           # 原始XML数据
 │   ├── Group/
@@ -654,13 +658,14 @@ inverted_index = [
    * 测试代码：
      ```python
         # 短语查询
-        text =  "close to"
+        text =  "to be or not to be"
         search_result = search_phrase(text, dictionary, inverted_index)
         print(search_result,"\n")
 
-    ```
    * 结果如下：
-      ![alt text](./picture/image-4.png)
+      ```
+      [42685, 62911] 
+      ```
    * 分析：
         * 扩展倒排表通过加入了词项在文档当中的位置信息，使得输入短语时能够通过比较短语中各个单词的相对位置来确定短语所在的文档信息，使得短语检索的逻辑更加简单清晰，算法设计也更加容易。
 
